@@ -1,0 +1,48 @@
+% Assuming the `transit_state_probs` matrix has already been calculated
+
+% Define the number of clusters
+num_clusters = 3; % Adjust this if needed
+
+% Generate the transition labels
+transit_labels = {};
+index = 1;
+for from_state = 1:num_clusters
+    for to_state = 1:num_clusters
+        if from_state ~= to_state
+            transit_labels{index} = sprintf('State %d to State %d', from_state, to_state);
+            index = index + 1;
+        end
+    end
+end
+
+% Plot the transition probabilities
+figure;
+hold on;
+
+% Define colors for each transition line
+transit_colors = lines(size(transit_state_probs, 2));
+
+% Plot each transition's probabilities over the sessions
+for transition = 1:size(transit_state_probs, 2)
+    plot(1:length(session_numbers), transit_state_probs(:, transition), '-o', ...
+        'LineWidth', 2, 'Color', transit_colors(transition, :));
+end
+
+% Add labels and title
+xlabel('Session Number');
+ylabel('Probability of Transitioning Between States');
+title('State Transition Probabilities Across Sessions');
+
+% Set x-axis ticks to match session numbers
+xticks(1:length(session_numbers));
+xticklabels(arrayfun(@(x) sprintf('Session %02d', x), session_numbers, 'UniformOutput', false));
+
+% Add legend for clarity
+legend(transit_labels, 'Location', 'best');
+
+% Adjust the plot for better visualization
+grid on;
+hold off;
+
+% Save the plot if desired
+saveas(gcf, fullfile(outputDir, 'transition_probabilities_plot.png'));
